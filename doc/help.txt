@@ -1,0 +1,89 @@
+Test
+
+Author: tar80 <tar80master@google.com>
+License: MIT License
+Repository: https://github.com/tar80/ppm-test
+===============================================================================
+
+テスト用スクリプトの実行環境。
+ベンチマーク、ハイライトチェッカーを含みます。
+ppm-switchmenuに項目を追加して使うことを想定しています。
+
+===============================================================================
+動作環境
+
+	ppm-switchmenuが必要。
+
+===============================================================================
+構成ファイルの説明
+
+	script\hl_checker.js	エントリリスト上にハイライト1-7で着色した
+		仮想エントリを生成する。実行時にShiftキーが押されていれば
+		PPeに16進数のリストを出力する
+	switchmenu\test.cfg	switchmenu用のプリセットメニュー
+	test\t.js		テスト実行用のスクリプト
+		ppm\cache\xxx\testにコピーされる
+	test\t_bench.js		コマンドのベンチマーク用スクリプト
+		ppm\cache\xxx\testにコピーされる
+
+===============================================================================
+test関数
+
+	テスト用スクリプト内ではtest関数を使用できます。
+
+		test.print(PPxID, Macro) PPxID上でmacroを展開した結果を出力
+			PPxID {string} PPxのID - C,V,B,~
+			Macro {string} 出力する文字列 - "string", "%n" など
+
+		test.menu(Menu Prefix, Callback) 一時的なメニューを作成し実行
+			Menu Prefix {string} 作成するメニューの頭文字
+				K(キー), E(拡張子判別), M(メニュー)のいずれか
+			Callback {function} メニュー項目を列挙した関数
+				メニュー項目は、test.menuItem関数で作成
+
+		test.menuItem(Name, Command) test.menuに設定するメニュー項目
+			Name {string} メニュー項目名、またはキー名
+			Command {string} 実行する内容
+
+		test.benchmark(Description, Loop count, Callback) ベンチマーク
+			Description {string} テスト全体の説明
+			Loop count {number} テストを実行する回数
+			Callback {function} テスト項目を列挙した関数
+				テスト項目は、test.measure関数で作成
+
+		test.measure(Description, Callback) 計測するテスト項目
+			Description {string} テスト項目の説明
+			Callback {function} Loop count回実行されるテスト内容
+
+===============================================================================
+ppmtest
+
+	シンプルなユニットテストを実行します。
+	\script\(jsciprt|ecma)\test.jsに対するユニットテストを
+	\t\utp_test.jsとして配置したうえで、いずれかのファイルに
+	\script\jscript\ppmtest_run.jsを実行してください。
+
+テスト関数
+
+	describe(string:description, function:callback)
+		description テスト全体の説明文
+		callback テスト項目(it|skip)
+
+	it(string:subject, function:callback)
+		subject テスト項目の説明
+		callback テストの内容(assert)
+
+	skip(string:subject, function:callback)
+		subject テスト項目の説明
+		callback テストの内容(assert)
+			変数conv_skip_to_it=trueが設定されていれば実行される
+
+	assert.equal(any:expected, any:actual)
+		expected と actual が同値であれば成功を返す
+
+	assert.notEqual(any:expected, any:actual)
+		expected と actual が同値でなければ成功を返す
+
+	assert.do(any:expected, function:callback)
+		callback を実行し、成功を返す
+
