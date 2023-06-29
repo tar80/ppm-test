@@ -65,7 +65,7 @@ proc['load'] = () => {
         '*mapkey use,K_ppmTestTemp%%:' +
         `*insert "${hl_hex.join(NL_PPX)}"`
     );
-    PPx.Execute('*deletecust K_ppmTestTemp');
+    PPx.Execute('*deletecust "K_ppmTestTemp"');
   }
 };
 proc['save'] = () => {

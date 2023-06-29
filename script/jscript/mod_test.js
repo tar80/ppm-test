@@ -45,11 +45,12 @@
     for (var key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         if (obj[key]) {
-          ary.push('"' + key + '":' + obj[key]);
+          var value = typeof(obj[key]) === 'string' ? '"' + obj[key] + '"' : obj[key];
+          ary.push(key + ':' + value);
         }
       }
     }
-    return '{' + ary.join(',') + '}';
+    return '{ ' + ary.join(', ') + ' }';
   };
   test.print = function (ppxid, msg) {
     var type = (function (m) {
@@ -80,7 +81,7 @@
     for (var key in bench_details) {
       if (Object.prototype.hasOwnProperty.call(bench_details, key)) {
         var resultTime = bench_do(count, bench_details[key]);
-        testlog(resultTime + '\t#' + key);
+        testlog(resultTime + '\t#' + key + ': ' + bench_details[key]());
       }
     }
     testlog('Finish.');
