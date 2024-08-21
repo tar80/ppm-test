@@ -98,7 +98,7 @@
     var menuArr = [];
     var delim = {E: ',', K: ',', M: '='}[type.toUpperCase()];
     menu_obj = {};
-    menuDelete(type);
+    menuDelete(menu);
     obj();
     for (var item in menu_obj) {
       if (Object.prototype.hasOwnProperty.call(menu_obj, item)) {

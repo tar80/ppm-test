@@ -1,12 +1,12 @@
-Test
+Test utilities
 
 Author: tar80 <tar80master@google.com>
 License: MIT License
 Repository: https://github.com/tar80/ppm-test
 ===============================================================================
 
-テスト用スクリプトの実行環境。
-ベンチマーク、ハイライトチェッカーを含みます。
+テスト用ユーティリティ
+テスト用スクリプト、ベンチマーク、ハイライトチェッカーを含みます。
 ppm-switchmenuに項目を追加して使うことを想定しています。
 
 ===============================================================================
@@ -17,73 +17,71 @@ ppm-switchmenuに項目を追加して使うことを想定しています。
 ===============================================================================
 構成ファイルの説明
 
-	script\hl_checker.js	エントリリスト上にハイライト1-7で着色した
-		仮想エントリを生成する。実行時にShiftキーが押されていれば
-		PPeに16進数のリストを出力する
-	switchmenu\test.cfg	switchmenu用のプリセットメニュー
-	test\t.js		テスト実行用のスクリプト
-		ppm\cache\xxx\testにコピーされる
-	test\t_bench.js		コマンドのベンチマーク用スクリプト
-		ppm\cache\xxx\testにコピーされる
+	dist\messHighlight.js
+		ハイライトのエントリリストへの出力
+		PPe上での16進数カラーコードの調整
+	userscript\_testHelper.js	テスト用のヘルパ関数モジュール
+	usercsript\quickRun.js		テスト実行用のスクリプト
+	usercsript\quickBench.js	ベンチマーク実行用のスクリプト
+	switchmenu\test.config		スイッチメニュー用設定ファイル
 
 ===============================================================================
-test関数
+スイッチメニューへの追加手順
 
-	テスト用スクリプト内ではtest関数を使用できます。
-
-		test.print(PPxID, Macro) PPxID上でmacroを展開した結果を出力
-			PPxID {string} PPxのID - C,V,B,~
-			Macro {string} 出力する文字列 - "string", "%n" など
-
-		test.menu(Menu Prefix, Callback) 一時的なメニューを作成し実行
-			Menu Prefix {string} 作成するメニューの頭文字
-				K(キー), E(拡張子判別), M(メニュー)のいずれか
-			Callback {function} メニュー項目を列挙した関数
-				メニュー項目は、test.menuItem関数で作成
-
-		test.menuItem(Name, Command) test.menuに設定するメニュー項目
-			Name {string} メニュー項目名、またはキー名
-			Command {string} 実行する内容
-
-		test.benchmark(Description, Loop count, Callback) ベンチマーク
-			Description {string} テスト全体の説明
-			Loop count {number} テストを実行する回数
-			Callback {function} テスト項目を列挙した関数
-				テスト項目は、test.measure関数で作成
-
-		test.measure(Description, Callback) 計測するテスト項目
-			Description {string} テスト項目の説明
-			Callback {function} Loop count回実行されるテスト内容
+1. PPc上でswitchmenuを呼び出し、0:Create new menu を実行します。
+   メニュー名を Test として登録します(別名でも可)。
+2. switchmenu.cfgの編集を確認するダイアログが出るので許可します。
+   &0:Create new menu の上に、&n:Test が追加されているので、
+   順番などを調整して保存します。
+3. PPc上でswitchmenuをリロードするとメニューが追加されます。
 
 ===============================================================================
-ppmtest
+テストメニュー
 
-	シンプルなユニットテストを実行します。
-	\script\(jsciprt|ecma)\test.jsに対するユニットテストを
-	\t\utp_test.jsとして配置したうえで、いずれかのファイルに
-	\script\jscript\ppmtest_run.jsを実行してください。
+&Edit	S_ppm#user:editorで%sgu'ppmcache'\usercsript\quickRun.jsを編集します
+&Bench	S_ppm#user:editorで%sgu'ppmcache'\usercsript\quickBench.jsを編集します
 
-テスト関数
+&Test	最後に編集したテストスクリプト(quickRun.js、またはquickBench.js)を実行
+	選択時にShiftキーが押されていた場合は、引数を指定できます
+&Result	最後に編集したテストスクリプト(quickRun.js、またはquickBench.js)を実行
+	PPx.resultをログ窓、またはPPb[T]に表示します
+	選択時にShiftキーが押されていた場合は、引数を指定できます
 
-	describe(string:description, function:callback)
-		description テスト全体の説明文
-		callback テスト項目(it|skip)
+&Highlight Checker
+	ハイライト色1-8番をエントリリスト上に出力します
+	選択時にShiftキーが押されていた場合は、PPeが起動しカラーコードを表示
+	カラーコードを編集後、Ctrl+Sで保存すると設定が更新されます
 
-	it(string:subject, function:callback)
-		subject テスト項目の説明
-		callback テストの内容(assert)
+===============================================================================
+testオブジェクト
 
-	skip(string:subject, function:callback)
-		subject テスト項目の説明
-		callback テストの内容(assert)
-			変数conv_skip_to_it=trueが設定されていれば実行される
+テスト用スクリプト内ではfso, ppm, testオブジェクトを使用できます。
+ppmオブジェクトはppmdevのドキュメントを読むか、userscript\_testHelper.jsを
+直接参照してください。
 
-	assert.equal(any:expected, any:actual)
-		expected と actual が同値であれば成功を返す
+	test.print(ppxid, value) PPxID上でvalueを展開した結果を出力
+		ppxid {string} PPxのID - C,V,B,. "."はカレントPPxID
+		value {string} 出力する文字列 - "string", "%n" など
 
-	assert.notEqual(any:expected, any:actual)
-		expected と actual が同値でなければ成功を返す
+	test.table(att, callback) 一時的なメニューを作成し実行
+		att      {string}   作成するメニューの頭文字
+			K(キー), E(拡張子判別), M(メニュー)のいずれか
+		callback {function} 関数内にメニュー項目を列挙
+			メニュー項目は、test.menuItem関数で作成
 
-	assert.do(any:expected, function:callback)
-		callback を実行し、成功を返す
+	test.tableItem(key, value) test.tableに設定するメニュー項目
+		key {string} メニュー項目名、またはキー名
+		value {string} 実行するコマンドライン
 
+	test.benchmark(desc, count, session) ベンチマーク
+		desc    {string}   テスト全体の説明
+		count   {number}   テストを実行する回数
+		session {function} 関数内にテスト項目を列挙
+			テスト項目は、test.measure関数で作成
+
+	test.measure(subject, callback) 計測するベンチマーク項目
+		subject  {string}   ベンチマーク項目の説明
+		callback {function} 関数内にcount回実行されるテストコードを記述
+
+===============================================================================
+vim:tw=79:ts=8:sts=0:sw=4:norl:noet:fen:

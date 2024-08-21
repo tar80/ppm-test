@@ -1,7 +1,7 @@
 # ppm-test
 
 ppx-plugin-manager用のプラグインです。  
-PPx用Jscriptのテスト環境を提供します。
+テスト用のユーティリティーです。
 
 ## インストール
 
@@ -10,4 +10,5 @@ PPx用Jscriptのテスト環境を提供します。
 ```text
 remote 'tar80/ppm-test'
 ```
+<!-- remote '<plugin-name>' [{branch: <branch-name>, commit: <commit-hash>}] -->
 
